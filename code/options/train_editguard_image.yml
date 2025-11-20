@@ -1,0 +1,125 @@
+# ============================================================
+# EditGuard – Image Fine-tuning (COCO2017)
+# ============================================================
+
+name: editguard_coco_finetune
+model: MIMO-VRN-h
+scale: 4
+
+gpu_ids: [0]
+gop: 1
+num_image: 1
+nf: 12
+is_train: True
+distortion: none
+addnoise: False
+addjpeg: False
+addpossion: False
+sdinpaint: False
+controlnetinpaint: False
+sdxl: False
+repaint: False
+hide: True
+bithide: False
+degrade_shuffle: False
+prompt: True
+prompt_len: 3
+message_length: 64
+losstype: mse
+mode: image
+
+use_tb_logger: true
+dist: False
+
+
+# ------------------- Paths -------------------
+datasets:
+  train:
+    name: COCO2017_train
+    mode: train
+    dataroot_GT: /mnt/ssd/BG/EditGuard/EditGuard/COCO2017/train2017/train2017
+    txt_path: /mnt/ssd/BG/EditGuard/EditGuard/COCO2017/train2017.txt
+
+    interval_list: [1]
+    random_reverse: false
+    border_mode: false
+    N_frames: 1
+
+    use_shuffle: true
+    n_workers: 8
+    batch_size: 1
+    GT_size: 256
+    color: RGB
+    use_flip: true
+    use_rot: true
+
+  val:
+    name: COCO2017_val
+    mode: train
+    dataroot_GT: /mnt/ssd/BG/EditGuard/EditGuard/COCO2017/train2017/train2017
+    txt_path: /mnt/ssd/BG/EditGuard/EditGuard/COCO2017/train2017.txt
+
+    interval_list: [1]
+    random_reverse: false
+    border_mode: false
+    N_frames: 1
+    
+    GT_size: 256
+
+# ------------------- Network -------------------
+network_G:
+  which_model_G: IBSN      # 실제로는 변수로 거의 안 쓰지만, 그냥 둬도 됨
+  subnet_type: DBNet       # ★ 원본은 DBNet, INV 말고 이걸 써야 함
+  in_nc: 12                # ★ 프리트레인과 반드시 동일
+  out_nc: 12               # ★ 동일
+  block_num: [6, 6]        # ★ 원본 설정
+  scale: 2                 # down_num = log2(2) = 1
+  init: xavier_group
+  block_num_rbm: 8         # ★ PPEM 블록 개수
+  block_num_trans: 4
+
+
+# ------------------- Training -------------------
+path:
+  pretrain_model_G: /mnt/ssd/BG/EditGuard/EditGuard/checkpoints/clean.pth
+
+  strict_load: false
+  resume_state: ~
+
+train:
+  lr_G: 2e-4
+  beta1: 0.9
+  beta2: 0.999
+
+  val_freq: 5000
+  save_freq: 5000
+
+  niter: 200000
+  lr_scheme: MultiStepLR
+  lr_steps: [50000, 100000, 150000]
+  lr_gamma: 0.5
+
+  weight_decay_G: 0
+  N_frames: 1
+
+  warmup_iter: 0
+  pixel_criterion_forw: l2
+
+  lambda_fit_forw: 1.0       # ★ forward 재구성 loss
+  lambda_rec_back: 1.0       # (뒤에서 필요해질 가능성 높음)
+  lambda_crossover: 1.0      # (cross loss 사용 시)
+  lambda_bit: 1.0            # 비트 손실 가중치
+
+# ------------------- Loss Functions -------------------
+loss:
+  pixel_weight: 1.0
+  vgg_weight: 1.0
+  lpips_weight: 1.0
+
+# ------------------- Logging -------------------
+logger:
+  display_freq: 100
+  save_checkpoint_freq: 5000
+  print_freq: 100
+  
+use_amp: true  # Mixed Precision for speed

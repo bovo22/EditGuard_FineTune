@@ -1,0 +1,13 @@
+torch>=1.12
+torchvision>=0.13
+opencv-python
+numpy
+pillow
+scipy
+scikit-image
+matplotlib
+tqdm
+tensorboard
+pyyaml
+einops
+lpips
