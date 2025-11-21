@@ -1,7 +1,7 @@
 # EditGuard Fine-tune
-COCO2017 이미지에 대해 EditGuard 모델을 파인튜닝한 레포지토리
+- COCO2017 이미지에 대해 EditGuard 모델을 파인튜닝한 레포지토리
 
-워터마크 삽입∙복원 성능을 유지하면서 Coverr PSNR향상을 목표로 함
++ 워터마크 삽입∙복원 성능을 유지하면서 Coverr PSNR향상을 목표로 함
 
 ---
 
@@ -21,6 +21,7 @@ COCO2017 이미지에 대해 EditGuard 모델을 파인튜닝한 레포지토리
 + Python 3.10 이상
 
 + CUDA 사용 가능 GPU (테스트 환경: CUDA 11.x)
+
 
 
 
